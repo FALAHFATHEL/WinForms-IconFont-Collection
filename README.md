@@ -1,5 +1,7 @@
 # 🎨 WinForms IconFont Collection
 
+> A high-DPI friendly icon font library for Windows Forms, with `IconFontManager` for simple in-memory font loading and UI integration.
+
 <p align="center">
 <img src="https://img.shields.io/badge/.NET%20Framework-4.7.2%2B-512BD4?logo=dotnet&logoColor=white" alt=".NET Framework 4.7.2+" />
 
@@ -23,20 +25,20 @@
   <img src="Poster.png" alt="Icon Collection Showcase" width="100%" style="border-radius: 10px;" />
 </p>
 
-
 ---
 
 ## The Problem: Why Traditional Icons Fail on Modern Screens
 
-If you’ve ever built a Windows Forms application and tested it on a high‑DPI monitor (4K, 125%, 150%, 200% scaling), you’ve witnessed the **icon blur**. A beautifully designed 32×32 pixel icon becomes a smeared, fuzzy mess the moment the operating system tries to stretch it to match the screen’s scaling factor.  
+If you’ve ever built a Windows Forms application and tested it on a high‑DPI monitor (4K, 125%, 150%, 200% scaling), you’ve witnessed the **icon blur**. A beautifully designed 32×32 pixel icon becomes a smeared, fuzzy mess the moment the operating system tries to stretch it to match the screen’s scaling factor.
 
-This isn’t a bug in your code – it’s a fundamental limitation of **raster (bitmap) image formats** like `.png` and `.ico`.  
+This isn’t a bug in your code – it’s a fundamental limitation of **raster (bitmap) image formats** like `.png` and `.ico`.
 
 ### How Bitmap Icons Work (and Why They Break)
 
 A PNG or ICO file stores an icon as a fixed grid of colored pixels. At 100% DPI (96 DPI standard), every pixel maps perfectly to a physical screen pixel. But modern screens have much higher pixel densities. To keep UI elements physically the same size, Windows tells applications to render at a larger logical scale – for example, **150%** means every control (and every icon) must be drawn 1.5× larger.
 
 With a bitmap, there is no extra detail beyond the original grid. The graphics engine must **interpolate** – guess what the extra pixels should look like. This interpolation creates:
+
 - **Blur and softness**: edges become undefined.
 - **Jagged “stair‑step” artifacts**: diagonal lines look pixelated.
 - **Inconsistent appearance**: icons designed at 16×16 look completely different from those forced to render at 24×24 or 32×32.
@@ -45,28 +47,9 @@ Even the common “multi‑resolution ICO” trick (embedding several fixed size
 
 ---
 
-### 🌐 المشكلة: لماذا تبدو الأيقونات التقليدية سيئة على الشاشات الحديثة
-
-إذا قمت سابقاً ببناء تطبيق Windows Forms وجربته على شاشة عالية الدقة (4K، أو إعدادات تكبير مثل 125% أو 150% أو 200%)، فأنت بالتأكيد لاحظت **ضبابية الأيقونات**. أيقونة صممت بدقة 32×32 بكسل تتحول إلى فوضى مشوشة عندما يحاول النظام تمديدها لتتناسب مع معامل التكبير.
-
-هذا ليس خطأً في كودك – بل هو قصور جوهري في **الصيغ النقطية (Bitmap)** مثل PNG و ICO.
-
-#### كيف تعمل الأيقونات النقطية – ولماذا تفشل
-
-ملف PNG أو ICO يخزّن الأيقونة على هيئة شبكة ثابتة من البكسلات الملوّنة. عند دقة 100% (96 DPI)، كل بكسل يقابل تماماً بكسل شاشة حقيقي. لكن الشاشات الحديثة تملك كثافة بكسلات أعلى بكثير. وللحفاظ على الحجم الفعلي للعناصر، يطلب ويندوز من التطبيقات أن ترسم بمقياس منطقي أكبر – مثلاً **150%** تعني أن كل عنصر (وكل أيقونة) يجب رسمه بحجم 1.5 ضعف.
-
-مع الصورة النقطية، لا توجد تفاصيل إضافية خارج الشبكة الأصلية. محرك الرسم يضطر إلى **الاستكمال (Interpolation)** – أي تخمين كيف يجب أن تبدو البكسلات الإضافية. هذا الاستكمال ينتج عنه:
-- **ضبابية وتلاشي**: الحواف تصبح غير محددة.
-- **تشوهات (Stair‑step)**: الخطوط القطرية تبدو مكعبة.
-- **مظهر غير متجانس**: أيقونات 16×16 تبدو مختلفة تماماً عند رسمها بحجم 24×24 أو 32×32.
-
-حتى حيلة الأيقونات متعددة الأحجام (ICO تحتوي على عدة طبقات 16×16، 32×32، 48×48) تفشل عند معاملات تكبير كسرية مثل 125% أو 175%، لأن المعامل نادراً ما يطابق أحد الأحجام الجاهزة. والنتيجة دائماً حل وسط غير مرضٍ.
-
----
-
 ## Why Icon Fonts Are the Superior Choice
 
-Icon fonts (`.ttf` / `.otf`) solve every scaling problem mentioned above **by design**. Instead of storing pixels, they store **mathematical outlines** – just like the system fonts you use for text (Segoe UI, Arial, etc.).  
+Icon fonts (`.ttf` / `.otf`) solve every scaling problem mentioned above **by design**. Instead of storing pixels, they store **mathematical outlines** – just like the system fonts you use for text (Segoe UI, Arial, etc.).
 
 ### The Vector Advantage
 
@@ -77,20 +60,21 @@ Icon fonts (`.ttf` / `.otf`) solve every scaling problem mentioned above **by de
 
 ---
 
-## 🔒 The Problem of Including Fonts
+## 🔒 Font Deployment & Resource Embedding
 
 When you use a custom icon font in a Windows Forms application, you must deliver the font file (`.ttf` / `.otf`) to every user’s machine so that the operating system can render the icons. How you deliver it directly impacts security, reliability, and maintenance.
 
 ### The Problem
+
 Fonts are normally stored in `C:\Windows\Fonts` and are available to all applications. To make a custom font available, you have three options:
 
-| Approach | Problems |
-| :--- | :--- |
-| **1. Install font globally** | - Requires administrator rights (UAC prompt).<br>- Pollutes the system font folder permanently.<br>- May conflict with other versions of the same font.<br>- Uninstalling your app does not remove the font.<br>- Breaks on locked‑down corporate environments. |
-| **2. Ship font as a loose file**| - The `.ttf` must be placed next to the `.exe` – easy to delete or lose.<br>- Network deployments and shortcuts break if the file is missing.<br>- Extra file means extra support headaches. |
-| **3. Embed font as resource** | ✅ **No admin rights needed.**<br>✅ **Single‑file deployment** – font lives inside the `.exe`.<br>✅ **Impossible to lose or misplace.**<br>✅ **Isolated** – no other app can see or interfere with it.<br>✅ **Clean uninstall** – nothing left behind. |
+| Approach                         | Problems                                                                                                                                                                                                                                                        |
+| :------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Install font globally**     | - Requires administrator rights (UAC prompt).<br>- Pollutes the system font folder permanently.<br>- May conflict with other versions of the same font.<br>- Uninstalling your app does not remove the font.<br>- Breaks on locked‑down corporate environments. |
+| **2. Ship font as a loose file** | - The `.ttf` must be placed next to the `.exe` – easy to delete or lose.<br>- Network deployments and shortcuts break if the file is missing.<br>- Extra file means extra support headaches.                                                                    |
+| **3. Embed font as resource**    | ✅ **No admin rights needed.**<br>✅ **Single‑file deployment** – font lives inside the `.exe`.<br>✅ **Impossible to lose or misplace.**<br>✅ **Isolated** – no other app can see or interfere with it.<br>✅ **Clean uninstall** – nothing left behind.      |
 
-### Why Embedding as a Resource is the Best Solution
+### Why Embedding as a Resource Works Well
 
 Embedding the font as a **binary resource** inside your `.exe` works by loading the font data directly into unmanaged memory and registering it with GDI+ via `PrivateFontCollection.AddMemoryFont`. The font exists **only in the memory of your process** and is completely invisible to the rest of the system. This technique:
 
@@ -102,271 +86,250 @@ Embedding the font as a **binary resource** inside your `.exe` works by loading 
 > ⚠️ **Critical implementation note:** The memory block holding the font data must not be freed until the `PrivateFontCollection` is disposed. Premature cleanup causes rendering crashes. Our architecture uses **deferred cleanup** (tracking all `IntPtr` pointers and freeing them only on application exit) to guarantee safety.
 
 ### Practical Benefits for WinForms Developers
+
 - **Zero installation on the client machine**: By embedding the font file directly inside your `.exe` as a resource, you bypass the need to install anything in the Windows Fonts folder. The font is loaded entirely from memory and stays private to your application.
 - **Single‑file deployment**: The icon set travels with your executable – no extra PNG files to lose or mismanage.
 - **Flexibility**: You can change the icon color, size, or even apply text effects (bold, outline) just by modifying the `Font` object’s properties. No need to ask a designer for a new asset file.
 
 ---
 
-### 🌐 مميزات الخطوط التي تحتوي على الأيقونات (Vector)
-- **دقة غير محدودة**: المخطط المتجهي Vector مستقل عن الدقة. عندما ترسمه بحجم 16 أو 64 أو 256 نقطة، يعيد النظام حساب الشكل بدقة باستخدام نفس المنحنيات الرياضية. والنتيجة **حدة كاملة عند أي مستوى DPI** – بلا استكمال ولا ضبابية.
-- **عرض تحت البكسلي (Sub‑pixel)**: محركات الخطوط الحديثة تطبق صقل الحواف (ClearType) الذي يستغل الترتيب الفيزيائي للبكسلات الثانوية في شاشات LCD، مما يجعل حواف الأيقونة أكثر نعومة وقراءةً مما يمكن لأي صورة نقطية تحقيقه.
-- **تجانس تام عبر التطبيق**: لأن خطوط الأيقونات ترسم بواسطة نفس محرك تنسيق النصوص، فهي تحترم تلقائياً إعدادات DPI للنظام. أنت تحدد حجم الخط بالنقاط، والنظام يتولى الباقي.
-- **مرونة عند التكبير والتصغير**: إذا كانت لديك صورة نقطية من النوع png أو ico فهي تأتي بحجم محدد مسبقاً وإذا أردت تكبيرها أو تصغيرها فهي لا تستجيب بشكل جيد لأن أبعادها مقيدة، ولكن عند استخدام خط يحتوي على الأيقونات فستحصل على مرونة كاملة في عملية تطوير التطبيقات لأنك ستعامل الأيقونات وكأنها حروف عادية.
+# 🚀 How to Use `IconFontManager`
 
-### 🌐 مشكلة تضمين الخط: لماذا تضمين الخط داخل ملف .exe مهم بدلاً من الاعتماد على خطوط الويندوز المثبتة مسبقاً؟
-عندما تستخدم خط أيقونات مخصصاً في تطبيق Windows Forms، يجب أن يصل ملف الخط (`.ttf` / `.otf`) إلى جهاز كل مستخدم ليتمكن النظام من رسم الأيقونات. الطريقة التي تختارها للتوصيل تؤثر مباشرة على الأمان والموثوقية والصيانة.
+The project now includes an `IconFontManager` class that handles the font lifecycle for you.  
+You no longer need to write `PrivateFontCollection`, `Marshal`, `AddFontMemResourceEx`, pointer tracking, or manual font cleanup code inside your Forms.
 
-#### المشكلة
-الخطوط عادةً ما تخزن في `C:\Windows\Fonts` وتكون متاحة لجميع التطبيقات. هناك ثلاث طرق لجعل خط مخصص متاحاً:
+### ✨ The Basic Idea
 
-| الطريقة | المشاكل |
-| :--- | :--- |
-| **1. تثبيت الخط بشكل نظامي** | - يتطلب صلاحيات مدير (ظهور UAC).<br>- يلوث مجلد خطوط النظام بشكل دائم.<br>- قد يتعارض مع نسخ أخرى من نفس الخط من برامج أخرى.<br>- إزالة التطبيق لا تزيل الخط – يضطر المستخدم للتنظيف يدوياً.<br>- يفشل في بيئات الشركات المقفلة حيث يُمنع تثبيت الخطوط. |
-| **2. توزيع الخط كملف منفصل** | - يجب أن يوضع بجانب `.exe` – سهل الحذف أو التغيير أو الضياع.<br>- الانتشار الشبكي والاختصارات تنكسر إذا اختفى الملف.<br>- ملف إضافي يعني صداع دعم فني إضافي. |
-| **3. تضمين الخط كمورد** | ✅ **لا حاجة لصلاحيات مدير.**<br>✅ **نشر أحادي الملف** – الخط يعيش داخل `.exe`.<br>✅ **مستحيل ضياعه أو تغييره.**<br>✅ **معزول** – لا تطبيق آخر يمكنه رؤية الخط أو التداخل معه.<br>✅ **إزالة نظيفة** – لا يترك أثراً بعد الحذف. |
+The workflow is only:
 
-#### لماذا التضمين كمورد هو الحل الأفضل؟
-تضمين الخط **كمورد ثنائي** داخل `.exe` يتم عبر تحميل بيانات الخط إلى ذاكرة غير مدارة وتسجيلها مع GDI+ باستخدام `PrivateFontCollection.AddMemoryFont`. الخط يوجد **فقط في ذاكرة عمليتك** وهو غير مرئي تماماً لبقية النظام. هذا الأسلوب:
-- **يتجاوز الحاجة لصلاحيات المسؤول** – لا تنصيب، ولا نوافذ UAC منبثقة.
-- **يضمن النسخة الدقيقة التي اختبرتها** – لا خطر من استبدال المستخدم لها بنسخة غير متوافقة.
-- **يمكّن النشر الحقيقي أحادي الملف** (xcopy، ClickOnce، MSIX) بدون أي ارتباطات خارجية.
-- **يحافظ على نظام المستخدم نظيفاً** – الخط يختفي عند خروج التطبيق.
-
-> ⚠️ **ملاحظة تنفيذية حرجة:** كتلة الذاكرة التي تحوي بيانات الخط يجب ألا تُحرّر قبل التخلص من `PrivateFontCollection`. التحرير المبكر يسبب أعطالاً في الرسم. بنيتنا تستخدم **التنظيف المؤجل** (تتبع جميع مؤشرات `IntPtr` وتحريرها فقط عند خروج التطبيق) لضمان السلامة الكاملة.
-
-#### فوائد عملية لمطوري WinForms
-- **صفر تثبيت على جهاز العميل**: عبر تضمين ملف الخط كمورد داخل `.exe`، تتجاوز الحاجة لتثبيت أي شيء في مجلد الخطوط. يُحمّل الخط بالكامل من الذاكرة ويبقى خاصاً بتطبيقك.
-- **نشر أحادي الملف**: مجموعة الأيقونات تسافر داخل الملف التنفيذي – لا ملفات PNG ضائعة أو منسية.
-- **مرونة**: تستطيع تغيير لون الأيقونة أو حجمها أو حتى تطبيق تأثيرات (خط عريض، حدود) بمجرد تعديل خصائص كائن `Font`. لا حاجة لطلب ملف جديد من المصمم.
+1. Add the `.ttf` font to **Resources**.
+2. Create **`IconFontManager`**.
+3. Apply it to **controls**
+4. Set the icon to control
+5. Dispose the manager.
 
 ---
 
-# 📖 How to Use Icon Fonts in WinForms | دليل استخدام أيقونات الخطوط
+# 🛠️ Step 1: Add the Font to Project Resources
+
+The font must be included in your application resources so it can be loaded as a `byte[]`.
+
+1. Open **Solution Explorer**.
+2. Right-click your project → **Properties**.
+3. Open **Resources**.
+4. Choose **Add Resource → Choose Type 'FILE' then Select File…**
+5. Select the `.ttf` or `.otf` file From The Icon Font in this repo Then Click Add.
+
+> 💡 **Tip:** Keep the resource name simple, for example `Design_icons`, `System_icons`, or `BRANDS_Icons`.
 
 ---
 
-## 🛠️ Step 1: Embedding the Font into Resources | أولاً: تضمين الخط داخل موارد المشروع
+# 💻 Step 2: Create the `IconFontManager`
 
-Before writing code, the font file (`.ttf` or `.otf`) must be bundled inside the application executable.
+Add the class to your project and import its namespace:
 
-قبل كتابة الكود، يجب دمج ملف الخط داخل ملف التطبيق التنفيذي عبر الخطوات التالية:
-
-1. In **Solution Explorer**, right-click the project and select **Properties**.
-2. Go to **Resources**; if it does not exist, click the link to create it.
-3. Click the **Add Resource** drop-down menu and select **Add Existing File…** (or click the **+** icon).
-4. In the file selection window, change the file type filter to **All Files** or **Font Files** and select your font.
-Your font is now included in the project resources.
-
----
-
-1. من **Solution Explorer**، اضغط بزر الفأرة الأيمن على المشروع واختر **Properties**.
-2. اذهب إلى تبويب **Resources**، وإذا لم يكن موجوداً اضغط على الرابط لإنشائه.
-3. اضغط على القائمة المنسدلة **Add Resource** واختر **Add Existing File…** أو اضغط على علامة **+**.
-4. في نافذة اختيار الملف، غيّر فلتر النوع إلى اختيار كافة الملفات ومن ثم قم باختيار الخط المطلوب.
-الآن خطك أصبح متاحاً وموجوداً في Resources المشروع كـ `byte[]`.
-
----
-
-## 💻 Step 2: Safe Memory Loading Code | ثانياً: كود تحميل الخط إلى الذاكرة
-
-Here is the clean, production-grade generic code. Copy this framework directly into your **Form** file (`Form1.cs`).
-
-هذا هو الكود العام والآمن، يمكنك نسخه ولصقه مباشرة داخل ملف النافذة لديك.
+1. Open **Solution Explorer**.
+2. Right-click your project Then → **Add** → **Existing Item...**
+3. Select The Class File `IconFontManager.cs`
+4. Now The Class is in your project
+5. Go into `Form1.cs` or Any Form You Need To Apply Font On And ADD Namespace IFM (Icon Font Manager)
 
 ```csharp
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Text;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using IFM;
+```
 
-namespace WinForms_IconFont_Demo
+The manager internally keeps track of the loaded fonts and their resources.
+
+Then create one manager for the Form and initialize it in Counstructor:
+
+> 💡 **Tip:** It's better to create a const variable for Font Name to avoid forgetting font name Like:
+
+```csharp
+private const string FONT_KEY_DEVICES = "Devices";
+```
+
+---
+
+# ➕ Step 3: Appling The Font
+
+### 1. Create an object of IconFontManager
+
+```csharp
+private readonly IconFontManager _fontManager = new IconFontManager();
+```
+
+### 2. Create constant variable for font key name
+
+```csharp
+private const string FONT_KEY = "Devies";
+```
+
+### 3. Create a LoadForm Event then apply font in it
+
+```csharp
+_fontManager.RegisterAndApply(FONT_KEY, Properties.Resources.Devices_icons, 20f, this);
+             //Parameters => (FONT_KEY, Bytes Array(Font), Start Size, CuurentInterface)
+```
+
+```csharp
+private void Form1_Load(object sender, EventArgs e)
 {
-    public partial class MainForm : Form
+    _fontManager.RegisterAndApply(FONT_KEY, Properties.Resources.Devices_icons, 20f, this);
+
+    // Apply Icon on controls
+    SetupFormIcons();
+}
+```
+
+### 4. Apply Icon On Controls using SetIconWithText() and SetIcon() Functions
+
+```csharp
+private void SetupFormIcons()
+{
+    // Set Icon With Text (Not Preffered)
+    _fontManager.SetIconWithText(btnSave, FONT_KEY, DevicesIcons.Save2Fill, "Save Data");
+
+    // Set Icon With no text
+    _fontManager.SetIcon(btnClose, FONT_KEY, DevicesIcons.CastLine);
+
+    // Set Icon With a specific font size
+    _fontManager.SetIcon(lblStatus, FONT_KEY, DevicesIcons.WIFI_Line, 40f);
+}
+```
+
+> 💡 **Note:** DevicesIcons is a class that has a const icon unicode variable to facilitate the process of finding icons
+
+```csharp
+public static class DevicesIcons
+{
+    public const string BarcodeBoxFill = "\ue900";
+    public const string AirplayFill = "\ue901";
+    public const string AirplayLine = "\ue902";
+    public const string BarcodeBoxLine = "\ue903";
+    public const string BarcodeFill = "\ue904";
+    public const string BarcodeLine = "\ue905";
+    public const string BaseStationFill = "\ue906";
+    //..............
+}
+```
+
+### 5. Free Memory
+
+```csharp
+protected override void OnFormClosed(FormClosedEventArgs e)
+{
+    base.OnFormClosed(e);
+    _fontManager?.Dispose();
+}
+```
+
+### `Form1.cs`
+
+```csharp
+public partial class Form1 : Form
+{
+    private readonly IconFontManager _fontManager = new IconFontManager();
+    private const string FONT_KEY = "Devies";
+    public Form1()
     {
-        // 1. Unified collection to store and manage custom font families
-        private PrivateFontCollection _privateFonts = new PrivateFontCollection();
+        InitializeComponent();
+    }
 
-        // 2. Generic font instances that will hold our custom icon fonts
-        private Font _iconFontPrimary;
-        private Font _iconFontSecondary;
+    private void Form1_Load(object sender, EventArgs e)
+    {
+        _fontManager.RegisterAndApply(FONT_KEY, Properties.Resources.Devices_icons, 20f, this);
 
-        // 3. Track unmanaged memory pointers to guarantee deferred, safe cleanup upon closing
-        private List<IntPtr> _fontPointers = new List<IntPtr>();
+        // Apply Icon on controls
+        SetupFormIcons();
+    }
 
-        // Win32 API to register the memory-resident font into the Windows GDI subsystem
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr AddFontMemResourceEx(IntPtr pbFont, uint cbFont, IntPtr pdv, [In] ref uint pcFonts);
+    private void SetupFormIcons()
+    {
+        // Set Icon With Text (Not Preffered)
+        _fontManager.SetIconWithText(btnSave, FONT_KEY, DevicesIcons.Save2Fill, "Save Data");
 
-        public MainForm()
-        {
-            InitializeComponent();
-            
-            // Execute the lifecycle steps
-            LoadAllFonts();
-            ApplyFontsToControls();
+        // Set Icon With no text
+        _fontManager.SetIcon(btnClose, FONT_KEY, DevicesIcons.CastLine);
 
-            // Bind the cleanup event to prevent memory corruption/leaks
-            this.FormClosed += MainForm_FormClosed;
-        }
+        // Set Icon With a specific font size
+        _fontManager.SetIcon(lblStatus, FONT_KEY, IconCodes.WIFI_Line, 40f);
+    }
 
-        /// <summary>
-        /// A generic, reusable method to load a font from resources into unmanaged memory.
-        /// </summary>
-        private Font CreateFontFromResource(byte[] fontResourceData, float fontSize)
-        {
-            // Allocate unmanaged block of memory matching the font size
-            IntPtr fontPtr = Marshal.AllocCoTaskMem(fontResourceData.Length);
-            
-            // Copy the raw byte array into the allocated unmanaged memory pointer
-            Marshal.Copy(fontResourceData, 0, fontPtr, fontResourceData.Length);
-
-            // Register the font with the native OS graphics subsystem (explicitly 1 font package)
-            uint numFonts = 1;
-            AddFontMemResourceEx(fontPtr, (uint)fontResourceData.Length, IntPtr.Zero, ref numFonts);
-
-            // Append the font to our managed PrivateFontCollection
-            _privateFonts.AddMemoryFont(fontPtr, fontResourceData.Length);
-
-            // Save pointer reference for bulk cleanup when the application exits
-            _fontPointers.Add(fontPtr);
-
-            // Instantiate the Font object using the most recently added index
-            int lastFontIndex = _privateFonts.Families.Length - 1;
-            return new Font(_privateFonts.Families[lastFontIndex], fontSize, FontStyle.Regular, GraphicsUnit.Point);
-        }
-
-        /// <summary>
-        /// PLACEHOLDER A: Load your custom fonts here.
-        /// </summary>
-        private void LoadAllFonts()
-        {
-            // Change 'Properties.Resources.YOUR_FONT' to your actual resource name, and adjust the size (e.g., 24, 32)
-            _iconFontPrimary = CreateFontFromResource(Properties.Resources.Design_icons, 24);
-            _iconFontSecondary = CreateFontFromResource(Properties.Resources.System_icons, 32);
-        }
-
-        /// <summary>
-        /// PLACEHOLDER B: Bind your fonts and glyphs to your UI controls.
-        /// </summary>
-        private void ApplyFontsToControls()
-        {
-            // Example for Primary Font (e.g., Toolbar Buttons)
-            button1.Font = _iconFontPrimary;
-            button1.Text = "\ue908"; // Replace with your Unicode glyph code
-
-            button2.Font = _iconFontPrimary;
-            button2.Text = "\ue937";
-
-            // Example for Secondary Font (e.g., Status Bar Icons)
-            button6.Font = _iconFontSecondary;
-            button6.Text = "\uf247"; 
-        }
-
-        /// <summary>
-        /// Clean up allocated resources cleanly upon form closure.
-        /// </summary>
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            // Dispose managed font wrappers
-            if (_iconFontPrimary != null) _iconFontPrimary.Dispose();
-            if (_iconFontSecondary != null) _iconFontSecondary.Dispose();
-            if (_privateFonts != null) _privateFonts.Dispose();
-
-            // Release all unmanaged memory buffers at once
-            foreach (IntPtr ptr in _fontPointers)
-            {
-                if (ptr != IntPtr.Zero)
-                {
-                    Marshal.FreeCoTaskMem(ptr);
-                }
-            }
-            _fontPointers.Clear();
-        }
+    // Free Memory
+    protected override void OnFormClosed(FormClosedEventArgs e)
+    {
+        base.OnFormClosed(e);
+        _fontManager?.Dispose();
     }
 }
-
 ```
 
----
+# 🎯 Using Scenarios
 
-## 🔍 Code Customization Guide | دليل تعديل الكود للمطورين
+## Scenario 1: Application-Wide Centralized Setup (Program.cs)
 
-To adapt this code to your specific project, you only need to modify **two specific places**:
-
-لتطويع هذا الكود ليناسب مشروعك الخاص، تحتاج فقط إلى تعديل **مكانيين محددين**:
-
-### 1️⃣ `LoadAllFonts()` Method: (تعديل الخط والحجم)
-
-Update the resource reference to match your actual `.ttf` file name inside your Resources.
-قم بتحديث مرجع المورد ليتطابق مع الاسم الفعلي لملف `.ttf` الموجود ضمن مجلد الموارد (Resources) لديك.
+For multi-form applications, register the font once at application startup to optimize memory usage
 
 ```csharp
-// Replace 'Design_icons' with the exact name of your resource file. 
-// You can also change the font size value (e.g. 24, 40) right here.
-_iconFontPrimary = CreateFontFromResource(Properties.Resources.YOUR_FONT_RESOURCE_NAME, 24);
+internal static class Program
+{
+    public static IconFontManager FontManager { get; private set; }
+    public const string FONT_KEY = "Devices";
 
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        // Global Instance
+        FontManager = new IconFontManager();
+        FontManager.AddFont(FONT_KEY, Properties.Resources.Devices_icons, 12f);
+
+        Application.Run(new Form1());
+
+        // Dispose on shutdown
+        FontManager.Dispose();
+    }
+}
 ```
-
-### 2️⃣ `ApplyFontsToControls()` Method: (تغيير الأيقونات بالكود)
-
-Assign the font variable to your specific WinForms controls (Buttons, Labels, Tabs) and input the correct Unicode for the icon you want to render.
-قم بتعيين متغير الخط لعناصر تحكم WinForms المحددة (الأزرار، والتسميات، وعلامات التبويب)، وأدخل رمز Unicode الصحيح للأيقونة التي ترغب في عرضها.
+Then apply it inside any Form:
 
 ```csharp
-yourButtonName.Font = _iconFontPrimary; // Set the font target
-yourButtonName.Text = "\uXXXX";        // Insert the specific Unicode value (e.g., "\ue908")
-
+private void Form2_Load(object sender, EventArgs e)
+{
+    Program.FontManager.ApplyToAll(this, Program.FONT_KEY);
+    Program.FontManager.SetIconWithText(btnDelete, Program.FONT_KEY, IconCodes.Delete, "Delete Item");
+}
 ```
-> [!IMPORTANT]
-> ⚠️ **Important Integration Note | ملاحظة هامة جداً قبل استخدام الكود**
->
-> **English:**
-> Before running the code, make sure to adjust the following names to match your current project structure:
-> 1. **Namespace:** Replace `WinForms_IconFont_Demo` with your project's actual namespace.
-> 2. **Form Class Name:** Change `MainForm` in the class definition (`public partial class MainForm : Form`) and constructor (`public MainForm()`) to match your Form's actual class name (e.g., `Form1`).
->
-> ---
->
-> **العربية:**
-> قبل البدء ببدء تشغيل أو نسخ الكود، يرجى التأكد من تعديل المسميات التالية لتتطابق مع هيكلية مشروعك:
-> 1. **مساحة الأسماء (Namespace):** استبدل `WinForms_IconFont_Demo` بـ Namespace الخاص بمشروعك الحقيقي.
-> 2. **اسم الفئة/النافذة (Form Class):** قم بتغيير الاسم `MainForm` في تعريف الفئة (`public partial class MainForm : Form`) وفي المشيد (`public MainForm()`) ليتطابق مع الاسم الفعلي للنافذة لديك (مثل `Form1`).
----
 
-## 🔤 What is Unicode & How to Find Icons | ما هو الـ Unicode وكيف تجد الأيقونات؟
+## Scenario 2: Apply Font by Control Type
+Target specific control types (e.g., all buttons in a form) without affecting labels or textboxes:
+```csharp
+_fontManager.ApplyToType<Button>(this, FONT_KEY);
+```
+## Scenario 3: Conditional Font Application (Predicate)
+Apply icon fonts to controls matching a custom condition:
+```csharp
+// Apply only to controls starting with "btnIcon_"
+_fontManager.ApplyWhere(this, FONT_KEY, ctrl => ctrl.Name.StartsWith("btnIcon_"));
+```
 
-### 💡 What is Unicode? | ما هو الـ Unicode؟
+# 🎯 API Reference
 
-Custom icon fonts do not use standard letters (like 'A', 'B', 'C'). Instead, they map vector icon designs to special placeholders called **Unicode Character Points** (usually looking like `\ue908` or `\uf1ba`). When you assign an icon font to a button and change its text to one of these codes, Windows Forms draws the high-resolution vector symbol instead of text.
-
-أيقونات الخطوط لا تستخدم الأحرف العادية (مثل أ، ب، ج). بدلاً من ذلك، تقوم بربط الأيقونات الشعاعية برموز برمجية خاصة تُسمى **Unicode Character Points** (تظهر عادةً على شكل `\ue908` أو `\uf1ba`). عندما تقوم بتعيين الخط المخصص لزر ما وتكتب هذا الكود في خاصية الـ Text، يقوم النظام برسم الأيقونة بدقة عالية بدلاً من النص العادي.
-
-### 🌐 Finding Icons Using the Repository's HTML Indexes | العثور على الأيقونات باستخدام فهارس HTML الخاصة بالمستودع
-
-To make finding icons effortless, **every font pack included in this repository comes with its own Interactive HTML index file** located in the same directory.
-
-لتسهيل العثور على الأيقونات، **يأتي كل خط في هذا المستودع مصحوباً بملف HTML تفاعلي خاص به** في نفس المجلد.
-
-> 🛠️ **How to use it:**
-> 1. Open the `.html` file corresponding to your font in any browser (Chrome, Edge, etc.).
-> 2. You will see a clean, visual grid displaying every single icon contained inside that font pack.
-> 3. Use the integrated **Search Bar** at the top of the webpage to quickly find specific icons (e.g., searching for "save", "settings", "user").
-> 4. Next to the icon, copy the provided Unicode value.
-> 5. In your C# code, prefix the code with `\u` (e.g., if the HTML index shows `e908`, paste it into Visual Studio as `"\ue908"`).
-> 
-> 
-
-> 🛠️ **طريقة الاستخدام:**
-> 1. افتح ملف الـ `.html` الخاص بالخط الذي تريده في أي متصفح إنترنت.
-> 2. ستظهر لك لوحة تفاعلية تعرض جميع الأيقونات الموجودة داخل هذا الخط بشكل مرئي.
-> 3. يمكنك استخدام **شريط البحث** المدمج في أعلى الصفحة للبحث عن أيقونة معينة بالاسم (مثال: ابحث عن "save" أو "home").
-> 4. ستجد بجانب كل أيقونة رمز الـ **Unicode** الخاص بها.
-> 5. لتبنيها داخل كود C#، قم بإضافة الرمز `\u` قبل الكود (مثال: إذا كان الرمز في صفحة الـ HTML هو `e908`، اكتبه في فيجوال ستوديو بهذا الشكل `"\ue908"`).
-> 
-> 
+| Method                                     | Description                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| AddFont(key, bytes, size)                  | Loads font data into memory and registers it under a unique key.          |
+| GetFont(key)                               | Safely retrieves the Font object for a given key (null if not found).     |
+| HasFont(key)                               | Returns true if the font key is currently loaded in memory.               |
+| RegisterAndApply(key, bytes, size, parent) | Registers font and applies it to all child controls of parent.            |
+| ApplyToAll(parent, key)                    | Recursively applies font to all child controls under parent.              |
+| ApplyToType<T>(parent, key)                | Applies font to all controls of type T within parent.                     |
+| ApplyWhere(parent, key, predicate)         | Applies font to controls satisfying a conditional function.               |
+| SetIcon(control, key, code)                | Sets standalone unicode icon on a control safely.                         |
+| SetIconWithText(control, key, code, text)  | Combines unicode icon and text string on a control safely.                |
+| SetIcon(control, key, code, size)          | Sets unicode icon with a custom font size override on a control.          |
+| Dispose()                                  | Releases all PrivateFontCollection handles and unmanaged memory pointers. |
 
 ---
 
@@ -386,35 +349,35 @@ The collection contains over **9,000+ scalable vector icons** divided into **26 
 
 ### 🗂️ Detailed Directory & Icon Counts | تفاصيل المجلدات وأعداد الأيقونات
 
-| # | Package Name (اسم الحزمة) | Total Icons (عدد الأيقونات) | Directory Name (اسم المجلد) |
-| --- | --- | --- | --- |
-| 1 | **FALCON Icon Collection Pack 1** | 2001 | `FALCON_Icons_Collection_Pack1` |
-| 2 | **General Icons Filled Pack 3** | 1053 | `Gereral_Icons_Filled_Pack3` |
-| 3 | **FALCON Icon Collection Pack 2** | 699 | `FALCON_Icon_Collection_Pack2` |
-| 4 | **Brands Icon Pack 1** | 606 | `Brands_Icons_Pack1` |
-| 5 | **General Icons PACK 2** | 562 | `General_Icons_Pack2` |
-| 6 | **Brands Icon Pack 2** | 501 | `Brands_Icons_Pack2` |
-| 7 | **General Icon Pack 1** | 491 | `General_Icons_Pack1` |
-| 8 | **System Icons** | 348 | `System_Icons` |
-| 9 | **Logos Icons** | 300 | `Logos_Icons` |
-| 10 | **Media Icons** | 296 | `Media_Icons` |
-| 11 | **Documents Icons** | 244 | `Documents_Icons` |
-| 12 | **Design Icons** | 236 | `Design_Icons` |
-| 13 | **Business Icons** | 220 | `Business_Icons` |
-| 14 | **Devices Icons** | 192 | `Devices_Icons` |
-| 15 | **Arrows Icons** | 178 | `Arrows_Icons` |
-| 16 | **Finance Icons** | 172 | `Finance_Icons` |
-| 17 | **Map Icons** | 172 | `Map_Icons` |
-| 18 | **Editor Icons** | 151 | `Editor_Icons` |
-| 19 | **Others Icons** | 116 | `Others_Icons` |
-| 20 | **Communications Icons** | 92 | `Communication_Icons` |
-| 21 | **Medical Icons** | 84 | `Medical_Icons` |
-| 22 | **Weather Icons** | 82 | `Weather_Icons` |
-| 23 | **Development Icons** | 66 | `Development_Icons` |
-| 24 | **Buildings Icons** | 62 | `Buildings_Icons` |
-| 25 | **Users Icons** | 53 | `Users_Icons` |
-| 26 | **Game Sport Icons** | 50 | `Game_Sports_Icons` |
-| 📐 | **Total Icons Library** | **9,061 Icons** |  |
+| #   | Package Name (اسم الحزمة)         | Total Icons (عدد الأيقونات) | Directory Name (اسم المجلد)     |
+| --- | --------------------------------- | --------------------------- | ------------------------------- |
+| 1   | **FALCON Icon Collection Pack 1** | 2001                        | `FALCON_Icons_Collection_Pack1` |
+| 2   | **General Icons Filled Pack 3**   | 1053                        | `Gereral_Icons_Filled_Pack3`    |
+| 3   | **FALCON Icon Collection Pack 2** | 699                         | `FALCON_Icon_Collection_Pack2`  |
+| 4   | **Brands Icon Pack 1**            | 606                         | `Brands_Icons_Pack1`            |
+| 5   | **General Icons PACK 2**          | 562                         | `General_Icons_Pack2`           |
+| 6   | **Brands Icon Pack 2**            | 501                         | `Brands_Icons_Pack2`            |
+| 7   | **General Icon Pack 1**           | 491                         | `General_Icons_Pack1`           |
+| 8   | **System Icons**                  | 348                         | `System_Icons`                  |
+| 9   | **Logos Icons**                   | 300                         | `Logos_Icons`                   |
+| 10  | **Media Icons**                   | 296                         | `Media_Icons`                   |
+| 11  | **Documents Icons**               | 244                         | `Documents_Icons`               |
+| 12  | **Design Icons**                  | 236                         | `Design_Icons`                  |
+| 13  | **Business Icons**                | 220                         | `Business_Icons`                |
+| 14  | **Devices Icons**                 | 192                         | `Devices_Icons`                 |
+| 15  | **Arrows Icons**                  | 178                         | `Arrows_Icons`                  |
+| 16  | **Finance Icons**                 | 172                         | `Finance_Icons`                 |
+| 17  | **Map Icons**                     | 172                         | `Map_Icons`                     |
+| 18  | **Editor Icons**                  | 151                         | `Editor_Icons`                  |
+| 19  | **Others Icons**                  | 116                         | `Others_Icons`                  |
+| 20  | **Communications Icons**          | 92                          | `Communication_Icons`           |
+| 21  | **Medical Icons**                 | 84                          | `Medical_Icons`                 |
+| 22  | **Weather Icons**                 | 82                          | `Weather_Icons`                 |
+| 23  | **Development Icons**             | 66                          | `Development_Icons`             |
+| 24  | **Buildings Icons**               | 62                          | `Buildings_Icons`               |
+| 25  | **Users Icons**                   | 53                          | `Users_Icons`                   |
+| 26  | **Game Sport Icons**              | 50                          | `Game_Sports_Icons`             |
+| 📐  | **Total Icons Library**           | **9,061 Icons**             |                                 |
 
 ---
 
@@ -432,30 +395,31 @@ Inside every individual folder, you will find the following assets:
 
 ### 1. 📂 `fonts/` (Directory / مجلد ملفات)
 
-* **English:** Contains the core scalable font files. The `.ttf` file inside this folder is the one you will import into Visual Studio's `Resources.resx`.
-* **العربية:** يحتوي على ملفات الخطوط الأساسية. ملف الـ `.ttf` الموجود داخل هذا المجلد هو الملف الذي ستقوم بتضمينه داخل موارد مشروعك `Resources.resx`.
+- **English:** Contains the core scalable font files. The `.ttf` file inside this folder is the one you will import into Visual Studio's `Resources.resx`.
+- **العربية:** يحتوي على ملفات الخطوط الأساسية. ملف الـ `.ttf` الموجود داخل هذا المجلد هو الملف الذي ستقوم بتضمينه داخل موارد مشروعك `Resources.resx`.
 
 ### 2. 🌐 `[Package_Name].html` (Interactive Document / صفحة ويب تفاعلية)
 
-* **English:** The visual index/cheat-sheet for the specific pack (e.g., `Arrows_Icons.html`). Open this in any browser to search, filter, and copy the precise Unicode points for your C# code.
-* **العربية:** الفهرس المرئي المخصص للحزمة (مثل `Arrows_Icons.html`). يمكنك فتحه في أي متصفح للبحث عن الأيقونات، وتصفيتها، ونسخ أكواد الـ Unicode الخاصة بها لاستخدامها في كود C#.
+- **English:** The visual index/cheat-sheet for the specific pack (e.g., `Arrows_Icons.html`). Open this in any browser to search, filter, and copy the precise Unicode points for your C# code.
+- **العربية:** الفهرس المرئي المخصص للحزمة (مثل `Arrows_Icons.html`). يمكنك فتحه في أي متصفح للبحث عن الأيقونات، وتصفيتها، ونسخ أكواد الـ Unicode الخاصة بها لاستخدامها في كود C#.
 
 ### 3. 📄 `selection.json` (JSON Source File / ملف بيانات المشروع)
 
-* **English:** The metadata configuration file containing the project definition, glyph mappings, and character codes. You can re-import this file back into tools like IcoMoon to edit or expand the font pack later.
-* **العربية:** ملف البيانات الوصفية (Metadata) الذي يحتوي على إعدادات المشروع وخريطة الرموز وأكوادها. يمكنك إعادة استيراد هذا الملف في أدوات مثل IcoMoon لتعديل حزمة الخطوط أو توسيعها لاحقاً.
+- **English:** The metadata configuration file containing the project definition, glyph mappings, and character codes. You can re-import this file back into tools like IcoMoon to edit or expand the font pack later.
+- **العربية:** ملف البيانات الوصفية (Metadata) الذي يحتوي على إعدادات المشروع وخريطة الرموز وأكوادها. يمكنك إعادة استيراد هذا الملف في أدوات مثل IcoMoon لتعديل حزمة الخطوط أو توسيعها لاحقاً.
 
 ### 4. 🎨 `style.css` (CSS Source File / ملف التنسيق)
 
-* **English:** Contains the CSS rules and class mappings for web projects. While not strictly used in Windows Forms, it serves as a valuable reference for internal font naming conventions.
-* **العربية:** يحتوي على قواعد التنسيق وربط الكلاسات المخصصة لمشاريع الويب. بالرغم من عدم استخدامه مباشرة في تطبيقات Windows Forms، إلا أنه يمثل مرجعاً ممتازاً لمعرفة الأسماء البرمجية الداخلية للأيقونات.
+- **English:** Contains the CSS rules and class mappings for web projects. While not strictly used in Windows Forms, it serves as a valuable reference for internal font naming conventions.
+- **العربية:** يحتوي على قواعد التنسيق وربط الكلاسات المخصصة لمشاريع الويب. بالرغم من عدم استخدامه مباشرة في تطبيقات Windows Forms، إلا أنه يمثل مرجعاً ممتازاً لمعرفة الأسماء البرمجية الداخلية للأيقونات.
 
 ### 5. 📂 `demo-files/` (Directory / مجلد ملفات العرض)
 
-* **English:** Internal components and assets required to properly render and style the interactive HTML preview page.
-* **العربية:** المكونات والملفات المساعدة المطلوبة لتشغيل وعرض صفحة الـ HTML التفاعلية وتنسيقها بشكل صحيح.
+- **English:** Internal components and assets required to properly render and style the interactive HTML preview page.
+- **العربية:** المكونات والملفات المساعدة المطلوبة لتشغيل وعرض صفحة الـ HTML التفاعلية وتنسيقها بشكل صحيح.
 
 ---
+
 ---
 
 ## 👨‍💻 About the Developer | عن المطور
@@ -484,6 +448,6 @@ We welcome contributions of any kind – icon pack suggestions, performance impr
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for details. You are free to use, modify, and distribute the code in personal or commercial projects, provided the original copyright notice remains intact.
+This project is licensed under the **MIT License**. See the `LICENSE` file for details. You are free to use, modify, and distribute the code in personal or commercial projects, provided the original copyright notice remains intact.
 
 ---
